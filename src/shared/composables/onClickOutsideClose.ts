@@ -1,6 +1,8 @@
-import { onUnmounted, watchEffect, ref, type Ref } from 'vue'
+import { onUnmounted, watchEffect, ref, type Ref, type ShallowRef } from 'vue'
 
-export const onClickOutsideClose = (element: Ref<HTMLElement | undefined>): Ref<boolean> => {
+export const onClickOutsideClose = (
+  element: Ref<HTMLElement | undefined> | Readonly<ShallowRef<HTMLElement | null>>,
+): Ref<boolean> => {
   const value = ref(false)
   const click = (e: Event) => {
     if (element.value && !e.composedPath().includes(element.value)) {

@@ -36,7 +36,7 @@ console.log(gridParams)
 
 // Список файлов/папок
 const files = ref<FileItem[]>([
-  { id: 1, name: 'Документ 1', row: 1, col: 5 },
+  { id: 1, name: 'Документ  as dassad  dasdadasd', row: 1, col: 5 },
   { id: 2, name: 'Папка 1', row: 2, col: 2 },
 ])
 

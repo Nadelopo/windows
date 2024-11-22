@@ -6,9 +6,6 @@ import Desktop from '@/components/Desktop.vue'
 <template>
   <main>
     <Desktop />
-    <img src="/icons/folder.svg" />
     <context-menu />
   </main>
 </template>
-
-<style scoped lang="scss"></style>
