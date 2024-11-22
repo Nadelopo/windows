@@ -32,48 +32,34 @@ gridCssParams.cols = Math.floor(
   window.innerWidth / (gridParams.value.cellSize + gridParams.value.gap),
 )
 
-console.log(gridParams)
-
-// Список файлов/папок
 const files = ref<FileItem[]>([
   { id: 1, name: 'Документ  as dassad  dasdadasd', row: 1, col: 5 },
   { id: 2, name: 'Папка 1', row: 2, col: 2 },
 ])
 
-// Функция для привязки к ближайшей ячейке
-// const snapToGrid = (x: number, y: number) => {
-//   const col = Math.max(
-//     1,
-//     Math.min(gridParams.value.cols, Math.round(x / gridParams.value.cellSize) + 1),
-//   )
-//   const row = Math.max(
-//     1,
-//     Math.min(gridParams.value.rows, Math.round(y / gridParams.value.cellSize) + 1),
-//   )
-//   return { row, col }
-// }
+const onDrop = (event: DragEvent, file: FileItem) => {
+  const { cellSize, gap, rows, cols } = gridParams.value
+  const row = Math.ceil(event.y / (cellSize + gap))
+  const col = Math.ceil(event.x / (cellSize + gap))
 
-// Обновление позиции элемента
-// const updatePosition = (id: number, x: number, y: number) => {
-//   const { row, col } = snapToGrid(x, y)
-//   const file = files.value.find((f) => f.id === id)
-//   if (file) {
-//     file.row = row
-//     file.col = col
-//   }
-// }
+  if (row > rows || col > cols) return
+
+  const isCellOccupied = files.value.some((f) => f.row === row && f.col === col && f.id !== file.id)
+  if (isCellOccupied) return
+
+  file.row = row
+  file.col = col
+}
 </script>
 
 <template>
-  <div class="desktop">
+  <div class="desktop" @dragover.prevent>
     <Folder
       v-for="file in files"
       :key="file.id"
-      :style="{
-        gridRow: file.row,
-        gridColumn: file.col,
-      }"
-      :name="file.name"
+      v-model="file.name"
+      :style="{ gridRow: file.row, gridColumn: file.col }"
+      @dragend="onDrop($event, file)"
     />
   </div>
 </template>
@@ -87,6 +73,12 @@ const files = ref<FileItem[]>([
   width: 100%;
   height: 100%;
   padding: 10px;
+}
+
+.dragging {
+  opacity: 0.99;
+  background: none;
+  color: transparent;
 }
 
 .file-item {

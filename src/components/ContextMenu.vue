@@ -10,21 +10,21 @@ const contextHeight = '300px'
 
 const position = reactive({ x: 0, y: 0 })
 
-const onContextMenu = (e: MouseEvent) => {
-  e.preventDefault()
+const onContextMenu = (event: MouseEvent) => {
+  event.preventDefault()
 
   isContextOpen.value = true
-  position.x = e.clientX
-  position.y = e.clientY
+  position.x = event.x
+  position.y = event.y
 
   const width = parseInt(contextWidth)
   const height = parseInt(contextWidth)
 
-  if (e.clientX + width > window.innerWidth) {
-    position.x = e.clientX - width
+  if (event.x + width > window.innerWidth) {
+    position.x = event.x - width
   }
-  if (e.clientY + height > window.innerHeight) {
-    position.y = e.clientY - height
+  if (event.y + height > window.innerHeight) {
+    position.y = event.y - height
   }
 }
 
@@ -43,6 +43,7 @@ onUnmounted(() => {
     ref="contextMenuRef"
     class="context-menu"
     :style="{ left: `${position.x}px`, top: `${position.y}px` }"
+    @click.right.stop.prevent
   >
     context
   </div>

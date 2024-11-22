@@ -3,8 +3,10 @@ import { ref, useTemplateRef, watch, watchEffect } from 'vue'
 import { useTextareaAutosize } from '@vueuse/core'
 import { onClickOutsideClose } from '@/shared/composables/onClickOutsideClose'
 
-const props = defineProps<{
-  name: string
+const name = defineModel<string>({ required: true })
+
+const emit = defineEmits<{
+  dragend: [DragEvent]
 }>()
 
 const folderRef = useTemplateRef('folder')
@@ -18,27 +20,43 @@ watchEffect(() => {
   }
 })
 
-const { textarea, input } = useTextareaAutosize({ input: props.name })
+const { textarea } = useTextareaAutosize({ input: name })
 watchEffect(() => {
   textarea.value?.select()
 })
 
 let previousFolderName = ''
 watch(isInputMode, () => {
-  previousFolderName = input.value
+  previousFolderName = name.value
 })
+
+const onEscape = () => {
+  name.value = previousFolderName
+  active.value = false
+}
+
+const isDragging = ref(false)
 </script>
 
 <template>
-  <div ref="folder" class="folder" @click="active = true">
+  <div
+    ref="folder"
+    class="folder"
+    :class="{ dragging: isDragging }"
+    draggable="true"
+    @click="active = true"
+    @dragstart="isDragging = true"
+    @dragend.prevent="emit('dragend', $event), (isDragging = false)"
+  >
     <div class="content" tabindex="0" :class="{ active }">
-      <img src="/icons/folder.svg" />
+      <img src="/icons/folder.svg" draggable="false" />
       <textarea
         v-if="isInputMode"
         ref="textarea"
-        v-model="input"
+        v-model="name"
         v-focus
-        @keydown.escape="(input = previousFolderName), (active = false)"
+        @keydown.escape="onEscape"
+        @keydown.enter="active = false"
       />
       <div v-else class="text" :class="{ active }" @click="isInputMode = true">
         {{ name }}
@@ -52,6 +70,11 @@ $bg: #d1d1d147;
 
 .folder {
   position: relative;
+  &.dragging {
+    opacity: 0.99;
+    background: none;
+    color: transparent;
+  }
 }
 .content {
   display: flex;
@@ -65,14 +88,12 @@ $bg: #d1d1d147;
   height: auto;
   position: absolute;
   outline: none;
+  font-size: 12px;
   &:hover {
     background: $bg;
   }
   &.active {
     background: $bg;
-  }
-  img {
-    user-select: none;
   }
   .text {
     width: 100%;
@@ -81,6 +102,8 @@ $bg: #d1d1d147;
     white-space: nowrap;
     text-overflow: ellipsis;
     word-wrap: break-word;
+    user-select: none;
+    text-align: center;
     &.active {
       overflow: unset;
       white-space: unset;
@@ -94,6 +117,7 @@ $bg: #d1d1d147;
     overflow-y: hidden;
     padding: 2px;
     outline: none;
+    text-align: center;
   }
 }
 </style>

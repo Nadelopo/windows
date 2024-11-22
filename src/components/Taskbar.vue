@@ -7,7 +7,7 @@ const { y } = useMouse()
 const componentRef = useTemplateRef('component')
 const isComponentHover = useElementHover(componentRef)
 
-const isOpen = computed(() => window.innerHeight - y.value < 40 || isComponentHover.value)
+const isOpen = computed(() => window.innerHeight - y.value < 30 || isComponentHover.value)
 </script>
 
 <template>
